@@ -55,9 +55,9 @@ def oob_r2(rf_reg, X_train, y_train):
         # Discard samples weren't OOB in any feature
         y_train = y_train[n_preds != 0]
         preds_matrix = preds_matrix[n_preds != 0]
-        avg_preds = preds_matrix / n_preds
-        oob_score = r2_score(y_train, avg_preds, )
-        return oob_score
+    avg_preds = preds_matrix / n_preds
+    oob_score = r2_score(y_train, avg_preds, )
+    return oob_score
 
 
 def permutation_importances(rf_clf, X_train, y_train, scorer):
