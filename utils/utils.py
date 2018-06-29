@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from .feature_imp import (permutation_importances,
+                          drop_column_importances,
+                          oob_r2,
+                          oob_accuracy)
 
 
 def plot_class_dist(array, x_labels, figsize=(8, 6)):
@@ -24,6 +28,35 @@ def plot_pca_var_explained(pca_transformer, figsize=(12, 6)):
     plt.xlabel('Principal component index', {'fontsize': 14})
     plt.ylabel('Explained variance ratio', {'fontsize': 14})
     plt.title('PCA on training data', {'fontsize': 18})
+
+
+def plot_feature_imp_v1(
+    rf, X_train, y_train, feature_names, mode='sklearn_importance',
+    figsize=(12, 6), title='Feature Importance'):
+    
+    if mode == 'permutation':
+        if rf.__class__.__name__ == 'RandomForestRegressor':
+            feature_imp = permutation_importances(rf, X_train, y_train, oob_r2)
+        else:
+            feature_imp = permutation_importances(
+                rf, X_train, y_train, oob_accuracy)
+
+    elif mode == 'drop_column':
+        feature_imp = drop_column_importances(rf, X_train, y_train)
+
+    elif mode == 'sklearn_importance':
+        feature_imp = rf.feature_importances_
+
+    else:
+        raise Exception(
+            'mode valid values: permutation, drop_column, sklearn_importance')
+
+    indices = np.argsort(feature_imp)
+    names = np.array([feature_names[i] for i in indices])
+    plt.figure(figsize=figsize)
+    plt.barh(range(len(feature_imp)), feature_imp[indices])
+    plt.yticks(range(len(feature_imp)), names)
+    plt.title(title, {'fontsize': 20})
 
 
 def plot_feature_imp(clf, feature_names, figsize=(12, 6)):
@@ -56,3 +89,28 @@ def plot_validation_curve(
     plt.legend()
     plt.xlabel(x_label, {'fontsize': 16})
     plt.title(title, {'fontsize': 20})
+
+
+def plot_cv_error(cv_error, metric_name='Accuracy', figsize=(12, 8)):
+    k = len(cv_error)
+    avg_cv_error = cv_error.mean()
+    std_cv_error = cv_error.std()
+    plt.figure(figsize=figsize)
+    plt.plot(range(1, k + 1), cv_error, label='CV error')
+    plt.plot([1, k], [avg_cv_error, avg_cv_error],
+             'r--', label='Average CV error')
+    plt.fill_between(range(1, k + 1), cv_error +
+                     std_cv_error, cv_error - std_cv_error, alpha=0.3)
+    plt.title(f'{k}-folds CV {metric_name}', fontsize='20')
+    plt.legend()
+    plt.xticks(range(1, k + 1), range(1, k + 1))
+
+
+def compute_stable_oob_score(rf, X_train, y_train, trials=5, metric_name='accuracy'):
+    oob_score = []
+    for i in range(trials):
+        rf.fit(X_train, y_train)
+        oob_score.append(rf.oob_score_)
+    avg_oob_score = np.mean(oob_score)
+    std_oob_score = np.std(oob_score)
+    print(f'average OOB {metric_name} : {avg_oob_score:.4f} +/- {std_oob_score:.4f}')
