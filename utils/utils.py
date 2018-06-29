@@ -31,7 +31,7 @@ def plot_pca_var_explained(pca_transformer, figsize=(12, 6)):
 
 
 def plot_feature_imp_v1(
-    rf, X_train, y_train, feature_names, mode='sklearn_importance',
+    rf, X_train, y_train, feature_names, mode='sklearn',
     figsize=(12, 6), title='Feature Importance'):
     
     if mode == 'permutation':
@@ -44,7 +44,8 @@ def plot_feature_imp_v1(
     elif mode == 'drop_column':
         feature_imp = drop_column_importances(rf, X_train, y_train)
 
-    elif mode == 'sklearn_importance':
+    elif mode == 'sklearn':
+        rf.fit(X_train, y_train)
         feature_imp = rf.feature_importances_
 
     else:
@@ -55,7 +56,7 @@ def plot_feature_imp_v1(
     names = np.array([feature_names[i] for i in indices])
     plt.figure(figsize=figsize)
     plt.barh(range(len(feature_imp)), feature_imp[indices])
-    plt.yticks(range(len(feature_imp)), names)
+    plt.yticks(range(len(feature_imp)), names, fontsize=16)
     plt.title(title, {'fontsize': 20})
 
 
