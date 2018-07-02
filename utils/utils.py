@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from scipy.stats import spearmanr, pearsonr
 import seaborn as sns
 from .feature_imp import (permutation_importances,
                           drop_column_importances,
@@ -107,7 +109,8 @@ def plot_cv_error(cv_error, metric_name='Accuracy', figsize=(12, 8)):
     plt.xticks(range(1, k + 1), range(1, k + 1))
 
 
-def compute_stable_oob_score(rf, X_train, y_train, trials=5, metric_name='accuracy'):
+def compute_stable_oob_score(
+    rf, X_train, y_train, trials=5, metric_name='accuracy'):
     oob_score = []
     for i in range(trials):
         rf.fit(X_train, y_train)
@@ -115,3 +118,33 @@ def compute_stable_oob_score(rf, X_train, y_train, trials=5, metric_name='accura
     avg_oob_score = np.mean(oob_score)
     std_oob_score = np.std(oob_score)
     print(f'average OOB {metric_name} : {avg_oob_score:.4f} +/- {std_oob_score:.4f}')
+
+
+def plot_corr_matrix(df, method='pearson', figsize=(10, 6)):
+    if method in ['pearson', 'spearman']:
+        corr_matrix = np.round(df.corr(method), 2)
+    else:
+        raise Exception('Valid values for method: [pearson, spearman]')
+    
+    mask = np.zeros_like(corr_matrix)
+    mask[np.triu_indices_from(mask)] = True
+    
+    # Plot the heat map
+    plt.style.use('seaborn-white')
+    cmap = sns.diverging_palette(0, 120, as_cmap=True)
+    sns.heatmap(
+        corr_matrix, mask=mask, annot=True, cmap=cmap, center=0, square=True,
+        linewidths=.1, cbar_kws={"shrink": .5})
+
+
+def get_high_correlated_features(df, method='pearson', threshold=0.9):
+    if method in ['pearson', 'spearman']:
+        corr_matrix = np.abs(np.round(df.corr(method), 2))
+    else:
+        raise Exception('Valid values for method: [pearson, spearman]')
+    
+    mask = np.triu(np.ones_like(corr_matrix), k=1).astype(np.bool)
+    corr_masked = corr_matrix.where(mask)
+    features = [feature for feature in corr_matrix.columns
+                if any(corr_masked[feature] >= threshold)]
+    return features
