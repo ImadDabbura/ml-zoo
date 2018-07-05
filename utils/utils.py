@@ -130,6 +130,7 @@ def plot_corr_matrix(df, method='pearson', figsize=(10, 6)):
     mask[np.triu_indices_from(mask)] = True
     
     # Plot the heat map
+    plt.figure(figsize=figsize)
     plt.style.use('seaborn-white')
     cmap = sns.diverging_palette(0, 120, as_cmap=True)
     sns.heatmap(
