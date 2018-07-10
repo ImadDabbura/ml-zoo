@@ -149,3 +149,19 @@ def get_high_correlated_features(df, method='pearson', threshold=0.9):
     features = [feature for feature in corr_matrix.columns
                 if any(corr_masked[feature] >= threshold)]
     return features
+
+
+def plot_features_vs_target(
+    X, y, feature_names, n_rows=1, n_cols=1, target_title='y',
+    figsize=(16, 12)):
+    """
+    Plot all features against target `y`. It is very help when target is a
+    a continuous feature.
+    """
+    f = plt.figure(figsize=figsize)
+    for feature, (i, name) in zip(X.T, enumerate(feature_names, 1)):
+        f.add_subplot(n_rows, n_cols, i)
+        plt.scatter(feature, y)
+        plt.xlabel(name, size=16)
+        plt.ylabel(target_title, size=16)
+        plt.tight_layout()
