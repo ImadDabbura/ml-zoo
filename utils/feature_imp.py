@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score
@@ -24,7 +26,7 @@ def oob_accuracy(rf_clf, X_train, y_train):
 
     # Avoid dividing by zero if some samples weren't included
     if (n_preds == 0).any():
-        print("Some features didn't have OOB samples.")
+        warnings.warn("Some features didn't have OOB samples.")
         y_train = y_train[n_preds != 0]
         preds_matrix = preds_matrix[n_preds != 0, :]
 
