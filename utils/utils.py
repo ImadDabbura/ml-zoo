@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr, pearsonr
 import seaborn as sns
-from .feature_imp import (permutation_importances,
+from feature_imp import (permutation_importances,
                           drop_column_importances,
                           oob_r2,
                           oob_accuracy)
