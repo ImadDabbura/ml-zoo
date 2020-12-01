@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr, pearsonr
 import seaborn as sns
-from feature_imp import (permutation_importances,
+from utils.feature_imp import (permutation_importances,
                           drop_column_importances,
                           oob_r2,
                           oob_accuracy)
@@ -112,7 +112,7 @@ def plot_cv_error(cv_error, metric_name='Accuracy', figsize=(12, 8)):
 def compute_stable_oob_score(
     rf, X_train, y_train, trials=5, metric_name='accuracy'):
     oob_score = []
-    for i in range(trials):
+    for _ in range(trials):
         rf.fit(X_train, y_train)
         oob_score.append(rf.oob_score_)
     avg_oob_score = np.mean(oob_score)

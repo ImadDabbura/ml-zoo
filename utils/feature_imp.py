@@ -8,6 +8,15 @@ from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
 
+def num_nodes(rf):
+    """
+    Return the total number of decision and leaf nodes in all trees of the 
+    forest.
+    Credit: @github/parrt/random-forest-importances/blob/master/src/rfpimp.py
+    """
+    return sum([tree.tree_.node_count for tree in rf.estimators_])
+
+
 def oob_accuracy(rf_clf, X_train, y_train):
     """Compute the out-of-bag accuracy of random forest classifier"""
     n_samples = X_train.shape[0]
