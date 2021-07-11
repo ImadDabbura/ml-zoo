@@ -1,0 +1,74 @@
+---
+title: "Linear Regression"
+author: "Imad Dabbura"
+data: "10/31/2017"
+output:
+    #pdf_document: default
+    html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE}
+library(ISLR)
+library(corrplot)
+library(ggplot2)
+library(psych)
+library(car)
+```
+## Introduction
+
+**Income:** Income in $10,000's.
+
+**Limit:** Credit limit.
+
+**Rating:** Credit rating.
+
+**Cards:** Number of credit cards.
+
+**Age:** Age in years.
+
+**Education:** Number of years of education.
+
+**Gender:** A factor with levels Male and Female.
+
+**Student:** A factor with levels No and Yes indicating whether the individual was a student.
+
+**Married:** A factor with levels No and Yes indicating whether the individual was married.
+
+**Ethnicity:** A factor with levels African American, Asian, and Caucasian indicating the individual's ethnicity.
+
+**Balance:** Average credit card balance in $.
+
+```{r, echo=FALSE}
+Credit <- Credit[, -1]
+str(Credit)
+```
+
+
+
+```{r, echo=FALSE}
+corrplot(cor(Credit[, -c(8:11)]), addCoef.col = "grey", type = "lower",
+         tl.srt = 45, tl.cex = 0.9)
+mtext("Correlation Plot", outer = TRUE, cex = 1.2)
+```
+
+```{r, echo=FALSE}
+pairs.panels(Credit[, -c(1, 8:11)])
+```
+
+
+```{r}
+hist(log(Credit$Balance), breaks = 15)
+hist(Credit$Balance, breaks = 15)
+hist(sqrt(Credit$Balance), breaks = 15)
+```
+
+```{r}
+reg_fit <- lm(Balance ~ . + Limit:Rating, data = Credit)
+summary(reg_fit)
+```
+
+
+```{r}
+vif(reg_fit)
+```
+
